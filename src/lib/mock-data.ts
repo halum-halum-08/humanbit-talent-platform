@@ -144,7 +144,7 @@ export function getMockFilterSuggestions(query: string, type: string): FilterSug
   );
 }
 
-export function getMockLinkedInProfiles(filters?: any): LinkedInProfile[] {
+export function getMockLinkedInProfiles(): LinkedInProfile[] {
   // Return a subset of profiles for demo purposes
   return mockLinkedInProfiles.slice(0, Math.floor(Math.random() * 8) + 3);
 }
