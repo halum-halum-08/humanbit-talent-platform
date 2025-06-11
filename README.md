@@ -1,36 +1,112 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HumanBit Talent Platform
 
-## Getting Started
+A modern, AI-powered talent recruitment platform built with Next.js 14, TypeScript, and Tailwind CSS. This application helps recruiters generate job descriptions using OpenAI and find candidates through LinkedIn Sales Navigator integration.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Assignment 1: LinkedIn Sales Navigator Dark Mode (40 Points)
+- **Manual Filter Selection**: Interactive filter search with RapidAPI LinkedIn integration
+- **Dynamic Suggestions**: Real-time filter suggestions for job titles, companies, locations
+- **Include/Exclude Logic**: Flexible filtering with include/exclude options
+- **Professional UI**: Dark theme with glassmorphism design elements
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Assignment 2: Agentic LinkedIn Search (60 Points)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+#### Stage 1: Landing Page & Job Description Generator (20 Points)
+- **Modern Landing Page**: Dark theme with gradient accents and smooth animations
+- **AI-Powered Generation**: OpenAI integration for comprehensive job descriptions
+- **Interactive UI**: Responsive design with micro-animations
+- **Editable Forms**: User-friendly form fields with validation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+#### Stage 2: AI-Powered Filter Optimization (40 Points)
+- **Intelligent Search**: AI-driven filter optimization and refinement
+- **Iterative Improvement**: Automatic fallback strategies for better results
+- **Profile Display**: Clean presentation of LinkedIn candidate profiles
+- **Result Management**: Pagination and professional candidate information display
 
-## Learn More
+## 🛠 Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Frontend**: Next.js 14, TypeScript, Tailwind CSS
+- **UI Components**: Custom glassmorphism components with Framer Motion
+- **AI Integration**: OpenAI API with structured outputs
+- **External APIs**: RapidAPI LinkedIn Sales Navigator
+- **Fonts**: Nunito (body), Encode Sans (headings)
+- **Animation**: Framer Motion for smooth transitions
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📦 Installation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd humanbit-talent-platform
+   ```
 
-## Deploy on Vercel
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. **Set up environment variables**
+   Create a `.env.local` file in the root directory:
+   ```env
+   # OpenAI API Configuration
+   OPENAI_API_KEY=your_openai_api_key_here
+   
+   # RapidAPI Configuration
+   RAPIDAPI_KEY=your_rapidapi_key_here
+   RAPIDAPI_HOST=linkedin-sales-navigator-no-cookies-required.p.rapidapi.com
+   
+   # Next.js Configuration
+   NEXT_PUBLIC_APP_URL=http://localhost:3000
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+4. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open your browser**
+   Visit [http://localhost:3000](http://localhost:3000)
+
+## 🚀 Deploy to GitHub & Vercel
+
+### Quick Deployment
+1. **Create GitHub Repository**
+   - Go to GitHub and create a new public repository named `humanbit-talent-platform`
+   - Don't initialize with README (we already have one)
+
+2. **Push to GitHub**
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit: HumanBit Talent Platform"
+   git remote add origin https://github.com/YOUR_USERNAME/humanbit-talent-platform.git
+   git branch -M main
+   git push -u origin main
+   ```
+
+3. **Deploy to Vercel**
+   - Connect your GitHub account to [Vercel](https://vercel.com)
+   - Import your repository
+   - Add environment variables (OPENAI_API_KEY, RAPIDAPI_KEY, RAPIDAPI_HOST)
+   - Deploy automatically
+
+📋 **Detailed deployment guide**: See [GITHUB_DEPLOYMENT.md](./GITHUB_DEPLOYMENT.md)
+
+## 🔧 Configuration
+
+### API Keys Setup
+
+#### OpenAI API Key
+1. Visit [OpenAI Platform](https://platform.openai.com)
+2. Create an account or sign in
+3. Navigate to API Keys section
+4. Create a new secret key
+5. Add it to your `.env.local` file
+
+#### RapidAPI LinkedIn Integration
+1. Visit [RapidAPI Hub](https://rapidapi.com/hub)
+2. Create a free account
+3. Subscribe to [LinkedIn Sales Navigator API](https://rapidapi.com/mgujjargamingm/api/linkedin-sales-navigator-no-cookies-required)
+4. Copy your API key from the dashboard
+5. Add it to your `.env.local` file

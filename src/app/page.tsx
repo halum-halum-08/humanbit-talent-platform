@@ -1,103 +1,129 @@
-import Image from "next/image";
+'use client';
+
+import React, { useState } from 'react';
+import { LandingPage } from '@/components/landing-page';
+import { JobDescriptionGenerator } from '@/components/job-description-generator';
+import { LinkedInFilterSearch } from '@/components/linkedin-filter-search';
+import { CandidateResults } from '@/components/candidate-results';
+import { JobDescription, SearchFilters } from '@/types';
+
+type AppState = 'landing' | 'job-generator' | 'filter-search' | 'results';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [appState, setAppState] = useState<AppState>('landing');
+  const [jobDescription, setJobDescription] = useState<JobDescription | null>(null);
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>({
+    jobTitles: [],
+    companies: [],
+    locations: [],
+    experienceLevels: [],
+    industries: []
+  });
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  const handleFindTalent = () => {
+    setAppState('job-generator');
+  };
+
+  const handleJobDescriptionGenerated = (job: JobDescription) => {
+    setJobDescription(job);
+    setAppState('filter-search');
+  };
+
+  const handleFiltersChange = (filters: SearchFilters) => {
+    setSearchFilters(filters);
+  };
+
+  const handleStartSearch = () => {
+    setAppState('results');
+  };
+
+  const handleBackToLanding = () => {
+    setAppState('landing');
+    setJobDescription(null);
+    setSearchFilters({
+      jobTitles: [],
+      companies: [],
+      locations: [],
+      experienceLevels: [],
+      industries: []
+    });
+  };
+
+  const handleBackToJobGenerator = () => {
+    setAppState('job-generator');
+  };
+
+  switch (appState) {
+    case 'landing':
+      return <LandingPage onFindTalent={handleFindTalent} />;
+    
+    case 'job-generator':
+      return (
+        <JobDescriptionGenerator
+          onBack={handleBackToLanding}
+          onNext={handleJobDescriptionGenerated}
+        />
+      );
+    
+    case 'filter-search':
+      return (
+        <div className="min-h-screen p-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-8">
+              <button
+                onClick={handleBackToJobGenerator}
+                className="text-purple-300 hover:text-white flex items-center gap-2"
+              >
+                ← Back to Job Description
+              </button>
+              <h1 className="text-3xl font-encode-sans font-bold gradient-text">
+                Search Configuration
+              </h1>
+              <div className="w-40" />
+            </div>
+            
+            {jobDescription && (
+              <div className="mb-8 p-4 glass rounded-lg">
+                <h3 className="text-lg font-encode-sans font-semibold text-white mb-2">
+                  Current Job: {jobDescription.title}
+                </h3>
+                <p className="text-gray-300 text-sm">
+                  {jobDescription.company} • {jobDescription.location} • {jobDescription.experienceLevel}
+                </p>
+              </div>
+            )}
+            
+            <LinkedInFilterSearch
+              onFiltersChange={handleFiltersChange}
+              initialFilters={searchFilters}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            
+            {/* Start Search Button */}
+            <div className="flex justify-center mt-8">
+              <button
+                onClick={handleStartSearch}
+                className="btn-gradient px-8 py-4 rounded-xl text-white font-encode-sans font-semibold text-lg hover:shadow-xl transition-all duration-300"
+                disabled={Object.values(searchFilters).every(arr => arr.length === 0)}
+              >
+                🚀 Start AI Search
+              </button>
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+      );
+    
+    case 'results':
+      return jobDescription ? (
+        <CandidateResults
+          jobDescription={jobDescription}
+          onBack={() => setAppState('filter-search')}
+          onStartNewSearch={handleBackToLanding}
+        />
+      ) : (
+        <LandingPage onFindTalent={handleFindTalent} />
+      );
+    
+    default:
+      return <LandingPage onFindTalent={handleFindTalent} />;
+  }
 }
