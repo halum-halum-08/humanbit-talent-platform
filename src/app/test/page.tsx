@@ -1,4 +1,5 @@
 import { generateJobDescription } from '@/lib/openai';
+import { JobDescription } from '@/types';
 
 export default async function TestJobGenerator() {
   const testPrompts = [
@@ -8,14 +9,13 @@ export default async function TestJobGenerator() {
     "Hiring a mobile developer for iOS apps",
     "Looking for a DevOps engineer with AWS experience"
   ];
-
-  const results = [];
+  const results: Array<{ prompt: string; job?: JobDescription; error?: string }> = [];
   for (const prompt of testPrompts) {
     try {
       const job = await generateJobDescription(prompt);
       results.push({ prompt, job });
     } catch (error) {
-      results.push({ prompt, error: error.message });
+      results.push({ prompt, error: error instanceof Error ? error.message : 'Unknown error occurred' });
     }
   }
 

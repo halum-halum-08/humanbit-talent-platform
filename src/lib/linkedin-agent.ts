@@ -2,8 +2,23 @@ import { ChatOpenAI } from '@langchain/openai';
 import { PromptTemplate } from '@langchain/core/prompts';
 import { RunnableSequence } from '@langchain/core/runnables';
 import { StringOutputParser } from '@langchain/core/output_parsers';
-import { JobDescription, SearchFilters, LinkedInProfile } from '@/types';
+import { JobDescription, SearchFilters, LinkedInProfile, LinkedInFilter } from '@/types';
 import { getFilterSuggestions, searchLinkedInProfiles } from './linkedin';
+
+// Define interfaces for AI responses
+interface AISuggestion {
+  jobTitles?: string[];
+  companies?: string[];
+  locations?: string[];
+  experienceLevels?: string[];
+  industries?: string[];
+}
+
+interface OptimizationSuggestion {
+  action: 'remove_filter' | 'broaden_search' | 'modify_filter';
+  filterToRemove?: string;
+  reasoning?: string;
+}
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const USE_MOCK_DATA = !OPENAI_API_KEY || OPENAI_API_KEY === 'your_openai_api_key_here';
@@ -178,13 +193,11 @@ export class LinkedInSearchAgent {
   }
 
   private simpleOptimizeFilters(currentFilters: SearchFilters, currentResultCount: number): SearchFilters {
-    const newFilters = { ...currentFilters };
-
-    if (currentResultCount === 0) {
+    const newFilters = { ...currentFilters };    if (currentResultCount === 0) {
       // Remove all exclude filters first
       Object.keys(newFilters).forEach(key => {
-        const filterArray = newFilters[key as keyof SearchFilters] as any[];
-        newFilters[key as keyof SearchFilters] = filterArray.filter(f => f.include) as any;
+        const filterArray = newFilters[key as keyof SearchFilters] as LinkedInFilter[];
+        newFilters[key as keyof SearchFilters] = filterArray.filter(f => f.include) as LinkedInFilter[];
       });
     } else if (currentResultCount < 20) {
       // Remove the most restrictive filters
@@ -198,10 +211,9 @@ export class LinkedInSearchAgent {
 
       if (allFilters.length > 1) {
         // Remove one random filter
-        const filterToRemove = allFilters[Math.floor(Math.random() * allFilters.length)];
-        Object.keys(newFilters).forEach(key => {
-          const filterArray = newFilters[key as keyof SearchFilters] as any[];
-          newFilters[key as keyof SearchFilters] = filterArray.filter(f => f.id !== filterToRemove.id) as any;
+        const filterToRemove = allFilters[Math.floor(Math.random() * allFilters.length)];        Object.keys(newFilters).forEach(key => {
+          const filterArray = newFilters[key as keyof SearchFilters] as LinkedInFilter[];
+          newFilters[key as keyof SearchFilters] = filterArray.filter(f => f.id !== filterToRemove.id) as LinkedInFilter[];
         });
       }
     }
@@ -209,7 +221,7 @@ export class LinkedInSearchAgent {
     return newFilters;
   }
 
-  private async convertToLinkedInFilters(aiSuggestions: any): Promise<SearchFilters> {
+  private async convertToLinkedInFilters(aiSuggestions: AISuggestion): Promise<SearchFilters> {
     const filters: SearchFilters = {
       jobTitles: [],
       companies: [],
@@ -265,10 +277,9 @@ export class LinkedInSearchAgent {
 
     return filters;
   }
-
   private async applyOptimization(
     currentFilters: SearchFilters,
-    optimization: any
+    optimization: OptimizationSuggestion
   ): Promise<SearchFilters> {
     const newFilters = { ...currentFilters };
 
@@ -276,19 +287,17 @@ export class LinkedInSearchAgent {
       case 'remove_filter':
         if (optimization.filterToRemove) {
           const filterType = optimization.filterToRemove;
-          const filterKey = `${filterType}s` as keyof SearchFilters;
-          if (newFilters[filterKey] && Array.isArray(newFilters[filterKey])) {
+          const filterKey = `${filterType}s` as keyof SearchFilters;          if (newFilters[filterKey] && Array.isArray(newFilters[filterKey])) {
             // Remove the least specific filter
-            (newFilters[filterKey] as any[]).pop();
+            (newFilters[filterKey] as LinkedInFilter[]).pop();
           }
         }
         break;
 
-      case 'broaden_search':
-        // Remove exclusion filters first
+      case 'broaden_search':        // Remove exclusion filters first
         Object.keys(newFilters).forEach(key => {
-          const filterArray = newFilters[key as keyof SearchFilters] as any[];
-          newFilters[key as keyof SearchFilters] = filterArray.filter(f => f.include) as any;
+          const filterArray = newFilters[key as keyof SearchFilters] as LinkedInFilter[];
+          newFilters[key as keyof SearchFilters] = filterArray.filter(f => f.include) as LinkedInFilter[];
         });
         break;
 
