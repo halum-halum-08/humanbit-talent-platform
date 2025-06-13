@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Wand2, ArrowLeft, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import { Wand2, ArrowLeft, ArrowRight, Loader2, AlertCircle, Plus, X, Edit3 } from 'lucide-react';
 import { AnimatedButton } from '@/components/ui/animated-button';
 import { GlassCard } from '@/components/ui/glass-card';
 import { JobDescription } from '@/types';
@@ -11,12 +11,15 @@ interface JobDescriptionGeneratorProps {
   onNext: (jobDescription: JobDescription) => void;
 }
 
-export function JobDescriptionGenerator({ onBack, onNext }: JobDescriptionGeneratorProps) {
-  const [prompt, setPrompt] = useState('');
+export function JobDescriptionGenerator({ onBack, onNext }: JobDescriptionGeneratorProps) {  const [prompt, setPrompt] = useState('');
   const [generatedJob, setGeneratedJob] = useState<JobDescription | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [newFeature, setNewFeature] = useState('');
+  const [newBenefit, setNewBenefit] = useState('');
+  const [newRequirement, setNewRequirement] = useState('');
+  const [newSkill, setNewSkill] = useState('');
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
@@ -74,6 +77,42 @@ export function JobDescriptionGenerator({ onBack, onNext }: JobDescriptionGenera
   const handleFieldChange = (field: keyof JobDescription, value: string | string[]) => {
     if (!generatedJob) return;
     setGeneratedJob({ ...generatedJob, [field]: value });
+  };
+
+  const addFeature = (type: 'benefits' | 'requirements' | 'skills', value: string) => {
+    if (!generatedJob || !value.trim()) return;
+    
+    const currentArray = generatedJob[type] || [];
+    const newArray = [...currentArray, value.trim()];
+    
+    setGeneratedJob({
+      ...generatedJob,
+      [type]: newArray,
+    });
+
+    // Clear the input
+    if (type === 'benefits') setNewBenefit('');
+    if (type === 'requirements') setNewRequirement('');
+    if (type === 'skills') setNewSkill('');
+  };
+
+  const removeFeature = (type: 'benefits' | 'requirements' | 'skills', index: number) => {
+    if (!generatedJob) return;
+    
+    const currentArray = generatedJob[type] || [];
+    const newArray = currentArray.filter((_, i) => i !== index);
+    
+    setGeneratedJob({
+      ...generatedJob,
+      [type]: newArray,
+    });
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent, type: 'benefits' | 'requirements' | 'skills', value: string) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addFeature(type, value);
+    }
   };
 
   const handleNext = () => {
@@ -207,9 +246,136 @@ export function JobDescriptionGenerator({ onBack, onNext }: JobDescriptionGenera
                           <option value="Senior Level">Senior Level</option>
                           <option value="Executive">Executive</option>
                         </select>
+                      </div>                    </div>
+                    
+                    {/* Job Description */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">
+                        Job Description
+                      </label>
+                      <textarea
+                        value={generatedJob.description}
+                        onChange={(e) => handleFieldChange('description', e.target.value)}
+                        rows={4}
+                        className="w-full p-2 bg-white/5 border border-white/20 rounded text-white focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                      />
+                    </div>
+
+                    {/* Requirements Management */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Requirements
+                      </label>
+                      <div className="space-y-2">
+                        {generatedJob.requirements.map((req, index) => (
+                          <div key={index} className="flex items-center gap-2 p-2 bg-white/5 rounded">
+                            <span className="flex-1 text-white">{req}</span>
+                            <button
+                              onClick={() => removeFeature('requirements', index)}
+                              className="text-red-400 hover:text-red-300 transition-colors"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={newRequirement}
+                            onChange={(e) => setNewRequirement(e.target.value)}
+                            onKeyPress={(e) => handleKeyPress(e, 'requirements', newRequirement)}
+                            placeholder="Add new requirement..."
+                            className="flex-1 p-2 bg-white/5 border border-white/20 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          />
+                          <AnimatedButton
+                            onClick={() => addFeature('requirements', newRequirement)}
+                            disabled={!newRequirement.trim()}
+                            size="sm"
+                            className="px-3"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </AnimatedButton>
+                        </div>
                       </div>
                     </div>
-                    {/* Add more editable fields as needed */}
+
+                    {/* Skills Management */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Required Skills
+                      </label>
+                      <div className="space-y-2">
+                        <div className="flex flex-wrap gap-2">
+                          {generatedJob.skills.map((skill, index) => (
+                            <div key={index} className="flex items-center gap-1 px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">
+                              <span>{skill}</span>
+                              <button
+                                onClick={() => removeFeature('skills', index)}
+                                className="text-purple-400 hover:text-purple-300 transition-colors"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={newSkill}
+                            onChange={(e) => setNewSkill(e.target.value)}
+                            onKeyPress={(e) => handleKeyPress(e, 'skills', newSkill)}
+                            placeholder="Add new skill..."
+                            className="flex-1 p-2 bg-white/5 border border-white/20 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          />
+                          <AnimatedButton
+                            onClick={() => addFeature('skills', newSkill)}
+                            disabled={!newSkill.trim()}
+                            size="sm"
+                            className="px-3"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </AnimatedButton>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Benefits Management */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Benefits & Perks
+                      </label>
+                      <div className="space-y-2">
+                        {(generatedJob.benefits || []).map((benefit, index) => (
+                          <div key={index} className="flex items-center gap-2 p-2 bg-green-500/10 border border-green-500/20 rounded">
+                            <span className="flex-1 text-green-300">{benefit}</span>
+                            <button
+                              onClick={() => removeFeature('benefits', index)}
+                              className="text-red-400 hover:text-red-300 transition-colors"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={newBenefit}
+                            onChange={(e) => setNewBenefit(e.target.value)}
+                            onKeyPress={(e) => handleKeyPress(e, 'benefits', newBenefit)}
+                            placeholder="Add new benefit or perk..."
+                            className="flex-1 p-2 bg-white/5 border border-white/20 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          />
+                          <AnimatedButton
+                            onClick={() => addFeature('benefits', newBenefit)}
+                            disabled={!newBenefit.trim()}
+                            size="sm"
+                            className="px-3"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </AnimatedButton>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 ) : (
                   <div className="space-y-6">
@@ -244,9 +410,7 @@ export function JobDescriptionGenerator({ onBack, onNext }: JobDescriptionGenera
                           <li key={index}>{req}</li>
                         ))}
                       </ul>
-                    </div>
-
-                    <div>
+                    </div>                    <div>
                       <h4 className="text-lg font-encode-sans font-semibold text-white mb-2">
                         Key Skills
                       </h4>
@@ -261,6 +425,21 @@ export function JobDescriptionGenerator({ onBack, onNext }: JobDescriptionGenera
                         ))}
                       </div>
                     </div>
+
+                    {/* Benefits Section */}
+                    {generatedJob.benefits && generatedJob.benefits.length > 0 && (
+                      <div>
+                        <h4 className="text-lg font-encode-sans font-semibold text-white mb-2 flex items-center gap-2">
+                          <Plus className="w-5 h-5 text-green-400" />
+                          Benefits & Perks
+                        </h4>
+                        <ul className="list-disc list-inside text-gray-300 space-y-1">
+                          {generatedJob.benefits.map((benefit, index) => (
+                            <li key={index} className="text-green-300">{benefit}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 )}
 
