@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Plus, X, Check, Filter } from 'lucide-react';
+import { Search, X, Check, Filter } from 'lucide-react';
 import { AnimatedButton } from '@/components/ui/animated-button';
 import { GlassCard } from '@/components/ui/glass-card';
 import { FilterSuggestion, LinkedInFilter, SearchFilters } from '@/types';
@@ -33,59 +33,64 @@ export function LinkedInFilterSearch({ onFiltersChange, initialFilters }: Linked
     { key: 'companies', label: 'Companies', icon: '🏢' },
     { key: 'locations', label: 'Locations', icon: '📍' },
     { key: 'experienceLevels', label: 'Experience Level', icon: '⭐' },
-    { key: 'industries', label: 'Industries', icon: '🏭' }
-  ];
+    { key: 'industries', label: 'Industries', icon: '🏭' }  ];
 
-  const debounce = useCallback((func: Function, delay: number) => {
-    let timeoutId: NodeJS.Timeout;
-    return (...args: any[]) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => func.apply(null, args), delay);
-    };
+  const searchSuggestions = useCallback(async (query: string, type: string) => {
+    if (!query.trim() || !type) return;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/linkedin/suggestions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, type }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setSuggestions(data.suggestions || []);
+      }
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const searchSuggestions = useCallback(
-    debounce(async (query: string, type: string) => {
-      if (!query.trim() || !type) return;
-
-      setIsLoading(true);
-      try {
-        const response = await fetch('/api/linkedin/suggestions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query, type }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setSuggestions(data.suggestions || []);
-        }
-      } catch (error) {
-        console.error('Error fetching suggestions:', error);
-      } finally {
-        setIsLoading(false);
-      }
+  const debouncedSearch = useCallback(
+    debounceFunction((query: string, type: string) => {
+      searchSuggestions(query, type);
     }, 300),
-    []
+    [searchSuggestions]
   );
 
+  // Simple debounce utility function
+  function debounceFunction<T extends (...args: Parameters<T>) => void>(
+    func: T,
+    delay: number
+  ): (...args: Parameters<T>) => void {
+    let timeoutId: NodeJS.Timeout;
+    return (...args: Parameters<T>) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func(...args), delay);
+    };
+  }
   useEffect(() => {
     if (searchQuery && activeFilterType) {
-      searchSuggestions(searchQuery, activeFilterType);
+      debouncedSearch(searchQuery, activeFilterType);
     } else {
       setSuggestions([]);
     }
-  }, [searchQuery, activeFilterType, searchSuggestions]);
+  }, [searchQuery, activeFilterType, debouncedSearch]);
 
   useEffect(() => {
     onFiltersChange(filters);
   }, [filters, onFiltersChange]);
-
   const addFilter = (suggestion: FilterSuggestion, include: boolean) => {
     const newFilter: LinkedInFilter = {
       id: suggestion.id,
       name: suggestion.name,
-      type: suggestion.type as any,
+      type: suggestion.type as 'jobTitle' | 'company' | 'location' | 'experienceLevel' | 'industry',
       include
     };
 

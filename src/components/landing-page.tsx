@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Search, Sparkles, Users, Target, Info } from 'lucide-react';
 import { AnimatedButton } from '@/components/ui/animated-button';

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { LinkedInSearchAgent } from '@/lib/linkedin-agent';
-import { JobDescription } from '@/types';
 
 export async function POST(request: NextRequest) {
   try {

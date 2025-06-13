@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import { Wand2, ArrowLeft, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import { AnimatedButton } from '@/components/ui/animated-button';
 import { GlassCard } from '@/components/ui/glass-card';
@@ -72,8 +71,7 @@ export function JobDescriptionGenerator({ onBack, onNext }: JobDescriptionGenera
       setIsGenerating(false);
     }
   };
-
-  const handleFieldChange = (field: keyof JobDescription, value: any) => {
+  const handleFieldChange = (field: keyof JobDescription, value: string | string[]) => {
     if (!generatedJob) return;
     setGeneratedJob({ ...generatedJob, [field]: value });
   };

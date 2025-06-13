@@ -8,12 +8,9 @@ export async function POST(request: NextRequest) {
         { error: 'Valid prompt is required' },
         { status: 400 }
       );
-    }
-      const startTime = Date.now();
-    const jobDescription = await generateJobDescription(prompt.trim());
-    const duration = Date.now() - startTime;
+    }    const jobDescription = await generateJobDescription(prompt.trim());
     
-    return NextResponse.json(jobDescription);  } catch (error) {
+    return NextResponse.json(jobDescription);} catch (error) {
     // Return more detailed error information
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     

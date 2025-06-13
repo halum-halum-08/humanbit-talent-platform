@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Building2, MapPin, ExternalLink, Mail, Loader2, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { User, Building2, MapPin, ExternalLink, Loader2, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { AnimatedButton } from '@/components/ui/animated-button';
 import { GlassCard } from '@/components/ui/glass-card';
 import { LinkedInProfile, JobDescription, SearchFilters } from '@/types';
@@ -20,20 +20,17 @@ export function CandidateResults({ jobDescription, onBack, onStartNewSearch }: C
   const [searchStats, setSearchStats] = useState({
     iterations: 0,
     totalResults: 0,
-    success: false
-  });
+    success: false  });
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchFilters, setSearchFilters] = useState<SearchFilters | null>(null);
   
   const profilesPerPage = 10;
   const totalPages = Math.ceil(profiles.length / profilesPerPage);
   const startIndex = (currentPage - 1) * profilesPerPage;
   const endIndex = startIndex + profilesPerPage;
   const currentProfiles = profiles.slice(startIndex, endIndex);
-
   useEffect(() => {
     startAISearch();
-  }, []);
+  }, [jobDescription]);
 
   const startAISearch = async () => {
     setIsSearching(true);
@@ -50,12 +47,9 @@ export function CandidateResults({ jobDescription, onBack, onStartNewSearch }: C
         }),
       });
 
-      if (!response.ok) throw new Error('Search failed');
-
-      const data = await response.json();
+      if (!response.ok) throw new Error('Search failed');      const data = await response.json();
       
       setProfiles(data.profiles || []);
-      setSearchFilters(data.filters);
       setSearchStats({
         iterations: data.iterations || 0,
         totalResults: data.totalResults || 0,
