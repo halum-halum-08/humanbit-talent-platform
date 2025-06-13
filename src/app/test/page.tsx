@@ -23,10 +23,9 @@ export default async function TestJobGenerator() {
     <div className="p-8 space-y-6">
       <h1 className="text-2xl font-bold mb-6">Job Description Generator Test</h1>
       
-      {results.map((result, index) => (
-        <div key={index} className="border p-4 rounded-lg">
+      {results.map((result, index) => (        <div key={index} className="border p-4 rounded-lg">
           <h3 className="font-semibold text-blue-600 mb-2">
-            Test {index + 1}: "{result.prompt}"
+            Test {index + 1}: &quot;{result.prompt}&quot;
           </h3>
           
           {result.job ? (

@@ -34,25 +34,7 @@ export function LandingPage({ onFindTalent }: LandingPageProps) {
     }
   ];
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-8">
-      <div className="max-w-6xl mx-auto text-center">
-        {/* Demo Banner */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-8"
-        >
-          <div className="glass p-4 rounded-lg border border-blue-500/30 bg-blue-500/10">
-            <div className="flex items-center justify-center gap-2 text-blue-300">
-              <Info className="w-5 h-5" />
-              <span className="text-sm font-medium">
-                🚀 Demo Mode Active - Full functionality with mock data for testing
-              </span>
-            </div>
-          </div>
-        </motion.div>
-
+    <div className="min-h-screen flex flex-col items-center justify-center p-8">      <div className="max-w-6xl mx-auto text-center">
         {/* Hero Section */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
